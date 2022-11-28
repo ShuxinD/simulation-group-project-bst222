@@ -1,4 +1,5 @@
-library(dplyr)
+# library(dplyr)
+library(data.table)
 
 #' health outcome analysis: association between PM2.5 and systolic blood pressure
 #' simulate different form of measurement error
@@ -7,34 +8,31 @@ library(dplyr)
 
 #' try 2 scenarios: the classical error vary by season; the classical error does not vary by season
 #' try 3 regression calibration methods: 
-#' 1) do 1 regression calibration for all the data;
+#' 1) do 1 regression calibration for sampled data
 #' 2) stratified regression calibration (by season); 
 #' 3) regression calibration with season as a variable
 
 #' try different sample size (100, 500, 1000 ,2000, 5000)
 #' the population size is 10000
 
-## load latent pm2.5 data ----
-latent <- readRDS("bst222pm25.rds")
+rm(list=ls())
+gc()
 
-## generate population data ----
-set.seed(3)
-### true pm25 ----
-besd <- 1; be <- rnorm(10000, mean=0, sd=besd) # get Berkson error
-truePM <- latent$pm25_pred+be # we could ignore the berkson error part in this study
+## ideal population data ----
+### load pm2.5 data ----
+ideal <- readRDS("bst222pm25.rds")
+names(ideal)[1] <- "truePM"
+setDT(ideal)
 ### systolic bp ----
-### generate blood pressure data 
-bpresidual <- rnorm(10000, mean=0, sd=5) # the sd of systolic bp in population is around 20?????[SD: why it is 5 here]
-bp <- bpresidual + 0.14*truePM + 127 # the relationship is assumed to be 127 + 0.14*pm25
+ideal$bp <- 5*ideal$truePM + 80 # the relationship is assumed to be 127 + 0.14*pm25 according to systematic review
 
 
 ## SCENARIO 1 ----
 #' the measurement error are the same across season
 #'  only work on classical measurement error here
-cesd <- 2; cd <- rnorm(10000, mean=0, sd=cesd) # get classical error, change the sd of classical error (try 1,2 and 3?)
-errorPM <- truePM+cd
-
-scen1Dat <- data.frame(bp, truePM, errorPM, season=latent$season)
+set.seed(3)
+cesd <- 0.5; cd <- rnorm(10000, mean=0, sd=cesd) # get classical error, change the sd of classical error (try 1,2 and 3?)
+ideal$errorPM_scen1 <- ideal$truePM + cd
 
 ## simulation for scenario 1
 set.seed(13)
@@ -42,47 +40,39 @@ sampleSize <- c(100, 500, 1000, 2000)
 
 scen1Result <- data.frame()
 
+coeffMat <- NA
 for (siz in 1:4) {
-  
   # matrix for storing the regression coefficients
-  coeffMat <- matrix(ncol = 5, nrow = 500)
-
-  
+  coeffMat <- matrix(ncol = 4, nrow = 500)
   for (iter in 1:500) {
-    
     print(iter)
-    
+    ## random sampling
     sampS <- sample(c(1:10000), size = sampleSize[siz])
-    subDat <- scen1Dat[sampS,]
-    
-    # regression calibration models
-    model1 <- lm(truePM~errorPM, data=subDat)
-    model2 <- lm(truePM~errorPM+as.factor(season), data=subDat)
-    model3 <- lm(truePM~errorPM*as.factor(season), data=subDat)
+    subDat <- ideal[sampS,]
+    ## regression calibration models
+    model1 <- lm(truePM~errorPM_scen1, data=subDat)
+    model2 <- lm(truePM~errorPM_scen1+as.factor(season), data=subDat)
+    model3 <- lm(truePM~errorPM_scen1*as.factor(season), data=subDat)
     ## predict the calibrated PM2.5 from different regression calibration methods
-    pmVal <- data.frame(predict(model1), predict(model2), predict(model3), subDat$truePM, subDat$errorPM)
+    pmVal <- data.frame(mod1_pred = predict(model1, newdata=ideal), 
+                        mod2_pred = predict(model2, newdata=ideal), 
+                        mod3_pred = predict(model3, newdata=ideal),
+                        ideal$errorPM_scen1)
     
-    for (rc in 1:5) {
+    for (rc in 1:4) {
       # estimate the association between systolic blood pressure and 
       # calibrated pm2.5, true pm2.5 and error-prone pm2.5
-      model4 <- lm(subDat$bp~pmVal[,rc])
+      model4 <- lm(ideal$bp ~ pmVal[,rc])
       coeffMat[iter, rc] <- model4$coefficients[2]
-      
-      
     }
-  
-    
   } 
   
   coeff <- as.data.frame(coeffMat)
-  colnames(coeff) <-c("regCal1", "regCal2", "regCal3", "truePM", "errorPM")
+  colnames(coeff) <-c("regCal1", "regCal2", "regCal3", "errorPM_scene1")
   coeff$sampleSize <- sampleSize[siz]
-  
   scen1Result <- rbind(scen1Result, coeff)
-  
-  
 }
-
+View(scen1Result)
 
 # SCENARIO 2: measurement error vary by season (additive only)
 
