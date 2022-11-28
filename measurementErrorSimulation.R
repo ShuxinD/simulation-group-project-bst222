@@ -1,4 +1,3 @@
-# library(dplyr)
 library(data.table)
 
 #' health outcome analysis: association between PM2.5 and systolic blood pressure
@@ -24,14 +23,14 @@ ideal <- readRDS("bst222pm25.rds")
 names(ideal)[1] <- "truePM"
 setDT(ideal)
 ### systolic bp ----
-ideal$bp <- 5*ideal$truePM + 80 # the relationship is assumed to be 127 + 0.14*pm25 according to systematic review
+ideal$bp <- 0.14*ideal$truePM + 127 # the relationship is assumed to be 127 + 0.14*pm25 according to systematic review
 
 
 ## SCENARIO 1 ----
 #' the measurement error are the same across season
 #'  only work on classical measurement error here
 set.seed(3)
-cesd <- 0.5; cd <- rnorm(10000, mean=0, sd=cesd) # get classical error, change the sd of classical error (try 1,2 and 3?)
+cesd <- 2; cd <- rnorm(10000, mean=0, sd=cesd) # get classical error, change the sd of classical error (try 1,2 and 3?)
 ideal$errorPM_scen1 <- ideal$truePM + cd
 
 ## simulation for scenario 1
@@ -66,7 +65,6 @@ for (siz in 1:4) {
       coeffMat[iter, rc] <- model4$coefficients[2]
     }
   } 
-  
   coeff <- as.data.frame(coeffMat)
   colnames(coeff) <-c("regCal1", "regCal2", "regCal3", "errorPM_scene1")
   coeff$sampleSize <- sampleSize[siz]
