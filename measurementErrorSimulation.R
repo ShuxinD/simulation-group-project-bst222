@@ -1,56 +1,40 @@
 library(dplyr)
 
+#' health outcome analysis: association between PM2.5 and systolic blood pressure
+#' simulate different form of measurement error
+#' use 3 regression calibration methods to correct for measurement error
+#' see how well the regression calibration methods could recover the true relationship between bp pm2.5
 
-# health outcome analysis: association between PM2.5 and systolic blood pressure
-# simulate different form of measurement error
-# use 3 regression calibration methods to correct for measurement error
-# see how well the regression calibration methods could recover the true relationship between bp pm2.5
+#' try 2 scenarios: the classical error vary by season; the classical error does not vary by season
+#' try 3 regression calibration methods: 
+#' 1) do 1 regression calibration for all the data;
+#' 2) stratified regression calibration (by season); 
+#' 3) regression calibration with season as a variable
 
+#' try different sample size (100, 500, 1000 ,2000, 5000)
+#' the population size is 10000
 
-## try 2 scenarios: the classical error vary by season; the classical error does not vary by season
-## try 3 regression calibration methods: do 1 regression calibration for all the data;
-##            stratified regression calibration (by season); regression calibration with season as a variable
+## load latent pm2.5 data ----
+latent <- readRDS("bst222pm25.rds")
 
-## try different sample size (100, 500, 1000 ,2000, 5000)
-
-
-
-
-# the population size is 10000
-
-### get the latent variable of PM2.5
-latent <- readRDS("D:\\PhD\\coursse materials\\BST222\\groupProject\\bst222pm25.rds")
-
-
-### generate the bp data and true PM2.5 data for the population of 10000
+## generate population data ----
 set.seed(3)
-## generate berkson error
-besd <- 1
-be <- rnorm(10000, mean=0, sd=besd)
-truePM <- latent$pm25_pred+be
-
-## we could ignore the berkson error part in this study
-
-### generate blood pressure data ( the sd of systolic bp in population is around 20)
-bpresidual <- rnorm(10000, mean=0, sd=5)
-# the relationship between pm2.5 and bp is assumed to be 127 + 0.14*pm25
-bp <- bpresidual+0.14*truePM+127
-
-season <- latent$season
+### true pm25 ----
+besd <- 1; be <- rnorm(10000, mean=0, sd=besd) # get Berkson error
+truePM <- latent$pm25_pred+be # we could ignore the berkson error part in this study
+### systolic bp ----
+### generate blood pressure data 
+bpresidual <- rnorm(10000, mean=0, sd=5) # the sd of systolic bp in population is around 20?????[SD: why it is 5 here]
+bp <- bpresidual + 0.14*truePM + 127 # the relationship is assumed to be 127 + 0.14*pm25
 
 
-
-
-# SCENARIO 1, the measurement error are the same across season
-
-## only work on classical measurement error here
-## generate classical error, change the sd of classical error (try 1,2 and 3?)
-cesd <- 2
-cd <- rnorm(10000, mean=0, sd=cesd)
+## SCENARIO 1 ----
+#' the measurement error are the same across season
+#'  only work on classical measurement error here
+cesd <- 2; cd <- rnorm(10000, mean=0, sd=cesd) # get classical error, change the sd of classical error (try 1,2 and 3?)
 errorPM <- truePM+cd
 
-
-scen1Dat <- data.frame(bp, truePM, errorPM, season)
+scen1Dat <- data.frame(bp, truePM, errorPM, season=latent$season)
 
 ## simulation for scenario 1
 set.seed(13)
