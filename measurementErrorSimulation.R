@@ -73,7 +73,7 @@ for (siz in 1:4) {
   scen1Result <- rbind(scen1Result, coeff)
 }
 setDT(as.data.frame(scen1Result))
-colnames(scen1Result) <-c("regCal1", "regCal2", "regCal3", "errorPM_scene1", "sampleSize")
+colnames(scen1Result) <-c("regCal1", "regCal2", "regCal3", "errorPM", "sampleSize")
 View(scen1Result)
 ## create results directory
 ifelse(dir.exists(file.path("results")), "results dir exists", dir.create(file.path("results")))
@@ -126,7 +126,7 @@ for (siz in 1:4) {
   scen21Result <- rbind(scen21Result, coeff)
 }
 setDT(scen21Result)
-colnames(scen21Result) <-c("regCal1", "regCal2", "regCal3", "errorPM_scene1", "sampleSize")
+colnames(scen21Result) <-c("regCal1", "regCal2", "regCal3", "errorPM", "sampleSize")
 View(scen21Result)
 ## create results directory
 ifelse(dir.exists(file.path("results")), "results dir exists", dir.create(file.path("results")))
@@ -179,7 +179,7 @@ for (siz in 1:4) {
   scen22Result <- rbind(scen22Result, coeff)
 }
 setDT(scen22Result)
-colnames(scen22Result) <-c("regCal1", "regCal2", "regCal3", "errorPM_scene1", "sampleSize")
+colnames(scen22Result) <-c("regCal1", "regCal2", "regCal3", "errorPM", "sampleSize")
 View(scen22Result)
 ## create results directory
 ifelse(dir.exists(file.path("results")), "results dir exists", dir.create(file.path("results")))
