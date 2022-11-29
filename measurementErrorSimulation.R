@@ -131,7 +131,7 @@ View(scen21Result)
 ## create results directory
 ifelse(dir.exists(file.path("results")), "results dir exists", dir.create(file.path("results")))
 ## save simulation results
-fwrite(scen21Result, file.path("results", "scen21Result.csv"))
+fwrite(scen21Result, file.path("results", "scen21Results.csv"))
 ### 2.2 multiplicative and additive ----
 ## additive error
 sErr_sd <- c(1, 1.5, 2, 2.5)
@@ -184,4 +184,4 @@ View(scen22Result)
 ## create results directory
 ifelse(dir.exists(file.path("results")), "results dir exists", dir.create(file.path("results")))
 ## save simulation results
-fwrite(scen22Result, file.path("results", "scen22Result.csv"))
+fwrite(scen22Result, file.path("results", "scen22Results.csv"))
