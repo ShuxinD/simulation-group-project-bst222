@@ -90,19 +90,25 @@ for (s in 1:4) {
   truePM_s <- ideal[season==s, truePM]
   set.seed(s)
   error <- rnorm(length(truePM_s), mean = 0, sd = sErr_sd[s]) # additive
-  errorPM_s <- truePM_s + error # multiplicative
+  errorPM_s <- truePM_s + error
   errorPM_scen21 <- c(errorPM_scen21, errorPM_s)
 }
 ideal <- cbind(ideal, errorPM_scen21)
 
-#### simulation ----
+### simulation ----
 sampleSize <- c(100, 500, 1000, 2000)
+
+pmVal <- NULL
+coeffMat <- NULL
 scen21Result <- data.frame()
+n_iter <- 500
 
 for (siz in 1:4) {
-  coeffMat <- matrix(ncol = 4, nrow = 500)
-  for (iter in 1:500) {
+  # matrix for storing the regression coefficients
+  coeffMat <- matrix(ncol = 4, nrow = n_iter)
+  for (iter in 1:n_iter) {
     print(iter)
+    ## random sampling
     set.seed(iter)
     sampS <- sample(c(1:10000), size = sampleSize[siz])
     subDat <- ideal[sampS,]
@@ -111,27 +117,29 @@ for (siz in 1:4) {
     model2 <- lm(truePM~errorPM_scen21+as.factor(season), data=subDat)
     model3 <- lm(truePM~errorPM_scen21*as.factor(season), data=subDat)
     ## predict the calibrated PM2.5 from different regression calibration methods
-    pmVal <- cbind(predict(model1, newdata = ideal),
-                   predict(model2, newdata = ideal), 
-                   predict(model3, newdata = ideal), 
+    pmVal <- cbind(predict(model1, newdata=ideal), 
+                   predict(model2, newdata=ideal), 
+                   predict(model3, newdata=ideal),
                    ideal$errorPM_scen21)
+    
     for (rc in 1:4) {
       # estimate the association between systolic blood pressure and 
-      # calibrated pm2.5, true pm2.5 and error-prone pm2.5
-      model4 <- lm(ideal$bp~pmVal[,rc])
+      # calibrated pm2.5, and error-prone pm2.5
+      model4 <- lm(ideal$bp ~ pmVal[,rc])
       coeffMat[iter, rc] <- model4$coefficients[2]
     }
   } 
   coeff <- cbind(coeffMat, sampleSize[siz])
   scen21Result <- rbind(scen21Result, coeff)
 }
-setDT(scen21Result)
+setDT(as.data.frame(scen21Result))
 colnames(scen21Result) <-c("regCal1", "regCal2", "regCal3", "errorPM", "sampleSize")
 View(scen21Result)
 ## create results directory
 ifelse(dir.exists(file.path("results")), "results dir exists", dir.create(file.path("results")))
 ## save simulation results
 fwrite(scen21Result, file.path("results", "scen21Results.csv"))
+
 ### 2.2 multiplicative and additive ----
 ## additive error
 sErr_sd <- c(1, 1.5, 2, 2.5)
@@ -148,14 +156,20 @@ for (s in 1:4) {
 }
 ideal <- cbind(ideal, errorPM_scen22)
 
-#### simulation ----
+### simulation ----
 sampleSize <- c(100, 500, 1000, 2000)
+
+pmVal <- NULL
+coeffMat <- NULL
 scen22Result <- data.frame()
+n_iter <- 500
 
 for (siz in 1:4) {
-  coeffMat <- matrix(ncol = 4, nrow = 500)
-  for (iter in 1:500) {
+  # matrix for storing the regression coefficients
+  coeffMat <- matrix(ncol = 4, nrow = n_iter)
+  for (iter in 1:n_iter) {
     print(iter)
+    ## random sampling
     set.seed(iter)
     sampS <- sample(c(1:10000), size = sampleSize[siz])
     subDat <- ideal[sampS,]
@@ -164,21 +178,22 @@ for (siz in 1:4) {
     model2 <- lm(truePM~errorPM_scen22+as.factor(season), data=subDat)
     model3 <- lm(truePM~errorPM_scen22*as.factor(season), data=subDat)
     ## predict the calibrated PM2.5 from different regression calibration methods
-    pmVal <- cbind(predict(model1, newdata = ideal),
-                   predict(model2, newdata = ideal), 
-                   predict(model3, newdata = ideal), 
+    pmVal <- cbind(predict(model1, newdata=ideal), 
+                   predict(model2, newdata=ideal), 
+                   predict(model3, newdata=ideal),
                    ideal$errorPM_scen22)
+    
     for (rc in 1:4) {
       # estimate the association between systolic blood pressure and 
-      # calibrated pm2.5, true pm2.5 and error-prone pm2.5
-      model4 <- lm(ideal$bp~pmVal[,rc])
+      # calibrated pm2.5, and error-prone pm2.5
+      model4 <- lm(ideal$bp ~ pmVal[,rc])
       coeffMat[iter, rc] <- model4$coefficients[2]
     }
   } 
   coeff <- cbind(coeffMat, sampleSize[siz])
   scen22Result <- rbind(scen22Result, coeff)
 }
-setDT(scen22Result)
+setDT(as.data.frame(scen22Result))
 colnames(scen22Result) <-c("regCal1", "regCal2", "regCal3", "errorPM", "sampleSize")
 View(scen22Result)
 ## create results directory
