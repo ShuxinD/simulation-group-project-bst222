@@ -1,5 +1,3 @@
-library(data.table)
-
 #' health outcome analysis: association between PM2.5 and systolic blood pressure
 #' simulate different form of measurement error
 #' use 3 regression calibration methods to correct for measurement error
@@ -13,6 +11,9 @@ library(data.table)
 
 #' try different sample size (100, 500, 1000 ,2000, 5000)
 #' the population size is 10000
+
+## set up ----
+library(data.table)
 
 rm(list=ls())
 gc()
