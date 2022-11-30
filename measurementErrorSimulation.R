@@ -80,11 +80,10 @@ ifelse(dir.exists(file.path("results")), "results dir exists", dir.create(file.p
 ## save simulation results
 fwrite(scen1Result, file.path("results", "scen1Results.csv"))
 
-## SCENARIO 2 ----
-### 2.1 additive ----
+## SCENARIO 2.1 additive ----
 ## additive error
 sErr_sd <- c(1, 1.5, 2, 2.5)
-#### generate error-prone data ----
+### generate error-prone data ----
 errorPM_scen21 <- NULL
 for (s in 1:4) {
   truePM_s <- ideal[season==s, truePM]
@@ -140,12 +139,12 @@ ifelse(dir.exists(file.path("results")), "results dir exists", dir.create(file.p
 ## save simulation results
 fwrite(scen21Result, file.path("results", "scen21Results.csv"))
 
-### 2.2 multiplicative and additive ----
+## SCENARIO 2.2 multiplicative and additive ----
 ## additive error
 sErr_sd <- c(1, 1.5, 2, 2.5)
 ## multiplicative error
 sErr_slopes <- c(1.9, 0.5, 0.8, 1.2) # for additive only, change all the slopes to 1
-#### generate error-prone data ----
+### generate error-prone data ----
 errorPM_scen22 <- NULL
 for (s in 1:4) {
   truePM_s <- ideal[season==s, truePM]
@@ -200,3 +199,31 @@ View(scen22Result)
 ifelse(dir.exists(file.path("results")), "results dir exists", dir.create(file.path("results")))
 ## save simulation results
 fwrite(scen22Result, file.path("results", "scen22Results.csv"))
+
+## test ----
+# sampleSize <- c(100, 500, 1000, 2000)
+# n_iter <- 500
+# scen21Result <- NULL
+# for (siz in 1:4) {
+#   # matrix for storing the regression coefficients
+#   coeffMat <- matrix(ncol = 4, nrow = n_iter)
+#   for (iter in 1:n_iter) {
+#     print(iter)
+#     ## random sampling
+#     set.seed(iter)
+#     sampS <- sample(c(1:10000), size = sampleSize[siz])
+#     subDat <- ideal[sampS,]
+#     ## regression calibration models
+#     model1 <- lm(truePM~errorPM_scen21, data=subDat)
+#     ## predict the calibrated PM2.5 from different regression calibration methods
+#     pmVal <- predict(model1, newdata=ideal)
+#     
+#     model4 <- lm(ideal$bp ~ pmVal)
+#     coeffMat[iter, ] <- model4$coefficients[2]
+#   } 
+#   coeff <- cbind(coeffMat, sampleSize[siz])
+#   scen21Result <- rbind(scen21Result, coeff)
+# }
+# scen21Result <- as.data.frame(scen21Result)
+# setDT(scen21Result)
+# scen21Result[,.(lowCI=quantile(V1,0.025)), by=V5]
