@@ -52,12 +52,12 @@ ggplot(plotDT_all, aes(x=1, y = point_est)) +
     panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.border = element_rect(colour = "black", fill=NA, size=1))
 
 ## plot scen1 ----
-plot_scen1 <- ggplot(plotDT_all[scen=="scen1",], aes(x=1, y = point_est)) +
-  geom_pointrange(size=0.5, aes(ymin = lowCI, ymax = highCI, color = sampleSize), position = position_dodge(0.8)) + 
+plot_scen1 <- ggplot(plotDT_all[scen=="scen1",], aes(x=sampleSize, y = point_est)) +
+  geom_pointrange(size=0.5, aes(ymin = lowCI, ymax = highCI), position = position_dodge(0.8)) + 
   geom_hline(yintercept = 0.14, linetype="solid", color = 1, size = 0.5) + 
-  ylab("Effect") + xlab("Calibration model") +
-  scale_x_discrete(labels=c("model1" = "Model 1", "model2" = "Model 2", "model3" = "Model 3")) + 
-  labs(color = "Calibration Sample Size") + 
+  ylab("Effect") + xlab("Calibration Sample Size") +
+  # scale_x_discrete(labels=c("model1" = "Model 1", "model2" = "Model 2", "model3" = "Model 3")) + 
+  # labs(color = "Calibration Sample Size") + 
   facet_wrap(vars(mod), scales = "free") +
   #facet_grid(scen~mod,scales = "free_y",  space = "fixed") +
   geom_hline(data = errorPM_dt[scen=="scen1",], aes(yintercept = errorPM), linetype= "dashed", color = 2, size = 0.5) +
@@ -65,14 +65,15 @@ plot_scen1 <- ggplot(plotDT_all[scen=="scen1",], aes(x=1, y = point_est)) +
   theme_minimal() + 
   theme(legend.position = "top",
         panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.border = element_rect(colour = "black", fill=NA, size=1))
+plot_scen1
 
 ## plot scen21 ----
-plot_scen21 <- ggplot(plotDT_all[scen=="scen21",], aes(x=1, y = point_est)) +
-  geom_pointrange(size=0.5, aes(ymin = lowCI, ymax = highCI, color = sampleSize), position = position_dodge(0.8)) + 
+plot_scen21 <- ggplot(plotDT_all[scen=="scen21",], aes(x=sampleSize, y = point_est)) +
+  geom_pointrange(size=0.5, aes(ymin = lowCI, ymax = highCI), position = position_dodge(0.8)) + 
   geom_hline(yintercept = 0.14, linetype="solid", color = 1, size = 0.5) + 
-  ylab("Effect") + xlab("Calibration model") +
-  scale_x_discrete(labels=c("model1" = "Model 1", "model2" = "Model 2", "model3" = "Model 3")) + 
-  labs(color = "Calibration Sample Size") + 
+  ylab("Effect") + xlab("Calibration Sample Size") +
+  # scale_x_discrete(labels=c("model1" = "Model 1", "model2" = "Model 2", "model3" = "Model 3")) + 
+  # labs(color = "Calibration Sample Size") + 
   facet_wrap(vars(mod), scales = "free") +
   #facet_grid(scen~mod,scales = "free_y",  space = "fixed") +
   geom_hline(data = errorPM_dt[scen=="scen21",], aes(yintercept = errorPM), linetype= "dashed", color = 2, size = 0.5) +
@@ -80,14 +81,15 @@ plot_scen21 <- ggplot(plotDT_all[scen=="scen21",], aes(x=1, y = point_est)) +
   theme_minimal() + 
   theme(legend.position = "top",
         panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.border = element_rect(colour = "black", fill=NA, size=1))
+plot_scen21
 
 ## plot scen22 ----
-plot_scen22 <- ggplot(plotDT_all[scen=="scen22",], aes(x=1, y = point_est)) +
-  geom_pointrange(size=0.5, aes(ymin = lowCI, ymax = highCI, color = sampleSize), position = position_dodge(0.8)) + 
+plot_scen22 <- ggplot(plotDT_all[scen=="scen22",], aes(x=sampleSize, y = point_est)) +
+  geom_pointrange(size=0.5, aes(ymin = lowCI, ymax = highCI), position = position_dodge(0.8)) + 
   geom_hline(yintercept = 0.14, linetype="solid", color = 1, size = 0.5) + 
-  ylab("Effect") + xlab("Calibration model") +
-  scale_x_discrete(labels=c("model1" = "Model 1", "model2" = "Model 2", "model3" = "Model 3")) + 
-  labs(color = "Calibration Sample Size") + 
+  ylab("Effect") + xlab("Calibration Sample Size") +
+  # scale_x_discrete(labels=c("model1" = "Model 1", "model2" = "Model 2", "model3" = "Model 3")) + 
+  # labs(color = "Calibration Sample Size") + 
   facet_wrap(vars(mod), scales = "free") +
   #facet_grid(scen~mod,scales = "free_y",  space = "fixed") +
   geom_hline(data = errorPM_dt[scen=="scen22",], aes(yintercept = errorPM), linetype= "dashed", color = 2, size = 0.5) +
@@ -95,6 +97,7 @@ plot_scen22 <- ggplot(plotDT_all[scen=="scen22",], aes(x=1, y = point_est)) +
   theme_minimal() + 
   theme(legend.position = "top",
         panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.border = element_rect(colour = "black", fill=NA, size=1))
+plot_scen22
 
 cairo_pdf(file.path("results/", "plot_scen1.pdf"), height = 5, width = 5)
 plot_scen1
