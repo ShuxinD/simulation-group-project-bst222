@@ -12,7 +12,7 @@ scen1Results <- fread(file.path("results", "scen1Results.csv"))
 scen21Results <- fread(file.path("results", "scen21Results.csv"))
 scen22Results <- fread(file.path("results", "scen22Results.csv"))
 
-## get data set plot ----
+## get the dataset for plotting----
 generatePlotData <- function(results_dt){
   # effect_error <- results_dt[[1,c(4)]]
   plot_dt <- rbind(results_dt[, .(lowCI=quantile(regCal1, 0.025),
@@ -24,13 +24,15 @@ generatePlotData <- function(results_dt){
                    results_dt[, .(lowCI=quantile(regCal3, 0.025),
                                   point_est=median(regCal3),
                                   highCI=quantile(regCal3, 0.975)), by=sampleSize][, mod:="model3"])
-  plot_dt[, sampleSize:= factor(sampleSize, levels = c("100", "500","1000", "2000"))]
   # View(plot_dt)
   return(plot_dt)
 }
+
+## summary the table for plotting ----
 plotDT_all <- rbind(cbind(generatePlotData(scen1Results), scen= "scen1"),
                     cbind(generatePlotData(scen21Results),scen= "scen21"),
                     cbind(generatePlotData(scen22Results),scen= "scen22"))
+plotDT_all[, sampleSize:= factor(sampleSize, levels = c("100", "500","1000", "2000"))]
 errorPM_dt <- data.table(scen=c("scen1", "scen21", "scen22"),
                          errorPM = c(scen1Results[1,errorPM], scen21Results[1,errorPM], scen22Results[1,errorPM]))
 
